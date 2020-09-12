@@ -1,0 +1,17 @@
+{% extends 'base_top.html' %}
+{% block content %}
+	<div class="container">
+		<div class="row">
+			<div class="col-sm-4">
+				{% block left %}{% endblock %}
+			</div>
+
+			<div class="col-sm-8">
+				{% block right_top %}{% endblock %}
+				<table class="table table-bordered">
+					{% block right %}{% endblock %}
+				</table>
+			</div>
+		</div>
+	</div>
+{% endblock %}

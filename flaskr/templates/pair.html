@@ -1,0 +1,67 @@
+{% extends 'base.html' %}
+
+{% block left %}
+	<div class="list-group list-group-flush">
+		<form action="/pairs/create_or_update">
+			<input type="text" class="list-group-item list-group-item-action mb-2 form-control" placeholder="id" name="id">
+			<input type="text" class="list-group-item list-group-item-action mb-2 form-control" placeholder="base" name="base">
+            <input type="text" class="list-group-item list-group-item-action mb-2 form-control" placeholder="quote" name="quote">
+			<input type="text" class="list-group-item list-group-item-action mb-2 form-control" placeholder="spend_sum" name="spend_sum">
+            <input type="text" class="list-group-item list-group-item-action mb-2 form-control" placeholder="profit_markup" name="profit_markup">
+			<input type="text" class="list-group-item list-group-item-action mb-2 form-control" placeholder="use_stop_loss" name="use_stop_loss">
+            <input type="text" class="list-group-item list-group-item-action mb-2 form-control" placeholder="stop_loss" name="stop_loss">
+             <input type="text" class="list-group-item list-group-item-action mb-2 form-control" placeholder="active" name="active">
+				<select class="form-control mb-2" name="type">
+					<option>create</option>
+					<option>update</option>
+					<option>delete</option>
+				</select>
+			<button formmethod="post" type="submit" class="list-group-item list-group-item-action btn btn-light">save</button>
+		</form>
+	</div>
+{% endblock %}
+
+{% block right_top %}
+<div class="card mb-2">
+  <div class="card-body">
+      <pre class="text-secondary"> EXEMPLE: 'active': True,
+          'base': 'USDT',
+          'quote': 'ETH',
+          'spend_sum': 11,  # Сколько тратить base каждый раз при покупке quote
+          'profit_markup': 3, # Какой навар нужен с каждой сделки? (0.001 = 0.1%)
+          'use_stop_loss': False, # Нужно ли продавать с убытком при падении цены
+          'stop_loss': 1, # 2%  # На сколько должна упасть цена,
+                                  что бы продавать с убытком
+     </pre>
+  </div>
+</div>
+{% endblock %}
+
+{% block right %}
+    <thead>
+        <tr>
+            <th>id</th>
+            <th>base</th>
+            <th>quote</th>
+            <th>spend_sum</th>
+            <th>profit_markup</th>
+            <th>use_stop_loss</th>
+            <th>stop_loss</th>
+            <th>active</th>
+        </tr>
+    </thead>
+    <tbody>
+    {% for obj in objs %}
+        <tr>
+            <th>{{ obj.id }}</th>
+            <td>{{ obj.base }}</td>
+            <td>{{ obj.quote }}</td>
+            <td>{{ obj.spend_sum }}</td>
+            <td>{{ obj.profit_markup }}</td>
+            <td>{{ obj.use_stop_loss }}</td>
+            <td>{{ obj.stop_loss }}</td>
+            <td>{{ obj.active }}</td>
+        </tr>
+    {% endfor %}
+    </tbody>
+{% endblock %}

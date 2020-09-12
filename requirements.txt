@@ -1,0 +1,5 @@
+flask
+Flask-SQLAlchemy
+requests
+pycrypto
+gunicorn

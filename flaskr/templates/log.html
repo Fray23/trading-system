@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+
+{% block left %}
+{% endblock %}
+
+
+{% block right %}
+{% for obj in objs %}
+        <thead>
+            <tr>
+                <th>order_id</th>
+                <th>description</th>
+                <th>order_type</th>
+                <th>log_type</th>
+                <th>price</th>
+                <th>quantity</th>
+                <th>commission</th>
+                <th>analysis_</th>
+                <th>create</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for obj in objs %}
+            <tr>
+                <th>{{ obj.order_id }}</th>
+                <th>{{ obj.description }}</th>
+                <th>{{ obj.order_type }}</th>
+                <th>{{ obj.log_type }}</th>
+                <th>{{ obj.price }}</th>
+                <th>{{ obj.quantity }}</th>
+                <th>{{ obj.commission }}</th>
+                <th>{{ obj.analysis_ }}</th>
+                <th>{{ obj.create }}</th>
+            </tr>
+        {% endfor %}
+        </tbody>
+{% endfor %}
+{% endblock %}

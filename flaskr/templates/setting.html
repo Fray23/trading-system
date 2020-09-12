@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+{% block left %}
+	<div class="list-group list-group-flush">
+		<form action="/setting/create_or_update">
+			<input type="text" class="list-group-item list-group-item-action mb-2 form-control" placeholder="slug" name="slug">
+			<input type="text" class="list-group-item list-group-item-action mb-2 form-control" placeholder="value" name="value">
+				<select class="form-control mb-2" name="type">
+					<option>create</option>
+					<option>update</option>
+					<option>delete</option>
+				</select>
+			<button formmethod="post" type="submit" class="list-group-item list-group-item-action btn btn-light">save</button>
+		</form>
+	</div>
+{% endblock %}
+
+{% block right_top %}
+<div class="card mb-2">
+  <div class="card-body text-secondary">slugs: run = 1/0 (default 0), pause = 60</div>
+</div>
+{% endblock %}
+
+{% block right %}
+	<thead>
+		<tr>
+			<th>id</th>
+			<th>name</th>
+			<th>value</th>
+		</tr>
+	</thead>
+	<tbody>
+	{% for obj in objs %}
+		<tr>
+			<td>{{ obj.id }}</td>
+			<td>{{ obj.slug }}</td>
+			<td>{{ obj.value }}</td>
+		</tr>
+	{% endfor %}
+	</tbody>
+{% endblock %}
