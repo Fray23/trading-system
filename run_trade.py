@@ -5,6 +5,7 @@ from bot.config import api
 from bot.utils import sync_time
 from bot.logger import log
 
+
 if __name__ == '__main__':
     sync_time(api, log, False, )
 

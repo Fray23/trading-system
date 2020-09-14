@@ -3,3 +3,4 @@ Flask-SQLAlchemy
 requests
 pycrypto
 gunicorn
+psycopg2-binary
