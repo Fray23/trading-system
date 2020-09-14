@@ -1,14 +1,14 @@
 import time
 import datetime
-import threading
 
-from flaskr.bot.analysis.analysis import analysis
-from flaskr.database import db_session as session
-from flaskr.models import Order, PairSetting, SettingValue, Log
+from bot.analysis.analysis import analysis
+from web.flaskr import db_session as session
+from bot.logger import logger, log
+from web.flaskr.models import Order, PairSetting, SettingValue
 from sqlalchemy import or_, and_
 
-from flaskr.config import api, pairs, log, TIMEFRAME, KLINES_LIMITS
-from flaskr.bot.utils import adjust_to_step, calc_buy_avg_rate, get_order_trades, sync_time
+from bot.config import api, get_timeframe, get_klines_limits
+from bot.utils import adjust_to_step, calc_buy_avg_rate, get_order_trades
 
 limits = api.exchangeInfo()
 
@@ -137,16 +137,9 @@ class OrderProcess:
         if 'orderId' in new_order:
             if side.lower() == 'buy':
                 self.order_id = new_order['orderId']
-                Log.create(
-                    order_id=new_order['orderId'],
-                    description=f"Создан ордер на покупку id:{new_order['orderId']} \
+                logger(description=f"Создан ордер на покупку id:{new_order['orderId']} \
                     price: {price},quantity: {quantity}",
-                    order_type='buy',
-                    log_type='info',
-                    price=price,
-                    quantity=quantity,
-                    log=log,
-                )
+                       log_type='info')
                 order = Order(
                     order_type='buy',
                     pair=self.pair,
@@ -158,20 +151,12 @@ class OrderProcess:
                 session.commit()
                 self.update_rate(method='buy')
             elif side.lower() == 'sell':
-                Log.create(
-                    order_id=new_order['orderId'],
-                    description=f"Создан ордер на продажу по рынку {new_order}",
-                    order_type='sell',
-                    log_type='info',
-                    price=price,
-                    quantity=quantity,
-                    log=log,
-                )
+                logger(description=f"Создан ордер на продажу по рынку {new_order}", log_type='info',)
                 session.query(Order).filter_by(
                     buy_order_id=self.order_id
                 ).update({
                     'order_type': side.lower(),
-                    'buy_finished': datetime.datetime.utcnow(),
+                    'sell_finished': datetime.datetime.utcnow(),
                     'sell_created': datetime.datetime.utcnow(),
                     'sell_order_id': new_order['orderId'],
                     'sell_amount': quantity,
@@ -179,6 +164,8 @@ class OrderProcess:
                 })
                 session.commit()
                 self.update_rate(method='sell')
+        else:
+            raise Exception('error order doesn\'t create')
 
         return new_order
 
@@ -205,9 +192,10 @@ def request_pause():
 
 def main_flow():
     while True:
-        if not run():
-            continue
         time.sleep(request_pause())
+        if not run():
+            logger(description='no run', log_type='no')
+            continue
         open_orders = get_running_orders()
         all_pairs = get_pairs()
 
@@ -239,18 +227,7 @@ def main_flow():
                         got_qty = order_process.get_qty()
                         bit_price = order_process.get_bit_price()
                         price_change = order_process.price_change(bit_price, order.obj.buy_price)
-
-                        Log.create(
-                            order_id=order.order_id,
-                            description="""
-                                Цена изменилась на {r:0.8f}%, процент для продажи {sp:0.8f}
-                                """.format(
-                                r=price_change, sp=all_pairs[pair]['profit_markup']),
-                            pair=pair,
-                            order_type=order.order_type,
-                            log_type='info',
-                            log=log,
-                        )
+                        logger(description=f"Цена изменилась на {price_change}%, процент для продажи {all_pairs[pair]['profit_markup']}", log_type='info')
 
                         if price_change >= profit_markup:
                             order_process.create_order(side='SELL', recvWindow=5000, quantity=got_qty)
@@ -261,19 +238,7 @@ def main_flow():
                 if use_stop_loss and order_status == 'FILLED' and order_type == 'buy':
                     curr_rate = float(api.tickerPrice(symbol=pair)['price'])
                     buy_price = order.obj.buy_price,
-
-                    Log.create(
-                        order_id=order.order_id,
-                        description="{pair} Цена упала до стоплосс (покупали по {b:0.8f}, сейчас {s:0.8f}), пора продавать".format(
-                            pair=pair,
-                            b=buy_price,
-                            s=curr_rate
-                        ),
-                        pair=pair,
-                        order_type='buy',
-                        log_type='info',
-                        log=log,
-                    )
+                    logger(description=f"{pair} Цена упала до стоплосс (покупали по {buy_price:0.8f}, сейчас {curr_rate:0.8f}), пора продавать", log_type='info')
 
                     if (1 - curr_rate / buy_price) * 100 >= stop_loss:
                         order_process.create_order(side='SELL', quantity=order.obj.buy_amount, recvWindow=15000)
@@ -282,16 +247,17 @@ def main_flow():
             del all_pairs[order.pair]
 
         if all_pairs:
-            Log.create(
-                description='Найдены пары, по которым нет неисполненных ордеров: {pairs}'.format(pairs=list(all_pairs.keys())),
-                log_type='debug',
-                log=log,
-            )
+            logger(
+                description=f'Найдены пары, по которым нет неисполненных ордеров: {all_pairs.keys()}',
+                log_type='debug')
+
             for pair, pair_obj in all_pairs.items():
+                timeframe = get_timeframe()
+                klines_limits = get_klines_limits()
                 klines = api.klines(
                     symbol=pair.upper(),
-                    interval=TIMEFRAME,
-                    limit=KLINES_LIMITS
+                    interval=timeframe,
+                    limit=klines_limits
                 )
                 order_process = OrderProcess(
                     order_id=None,
@@ -314,20 +280,18 @@ def main_flow():
                     balance['asset']: float(balance['free']) for balance in api.account()['balances']
                     if balance['asset'] in [pair_obj['base'], pair_obj['quote']]
                 }
-                Log.create(
-                    description="Баланс {balance}".format(balance=["{k}:{bal:0.8f}".format(k=k, bal=balances[k]) for k in balances]),
-                    log_type='debug',
-                    log=log,)
+                logger(
+                    description=f"Баланс {balances}",
+                    log_type='debug')
 
                 if balances[base_currency] >= spend_sum:
                     my_amount = adjust_to_step(spend_sum / top_price, stepSize)
 
                     if my_amount < float(stepSize) or my_amount < float(minQty):
 
-                        Log.create(
+                        logger(
                             description="Покупка невозможна, выход. Увеличьте размер ставки",
-                            log_type='warning',
-                            log=log,)
+                            log_type='warning')
                         continue
 
                     trade_am = top_price * my_amount
@@ -338,15 +302,3 @@ def main_flow():
                             incr=minNotional
                         ))
                     order_process.create_order(recvWindow=5000, side='BUY', quantity=my_amount, price=top_price)
-
-
-def run_bot():
-    sync_time(api, log, False,)
-
-    t1 = threading.Thread(target=main_flow)
-    t2 = threading.Thread(target=sync_time, args=(api, log, True,))
-
-    threads = [t1, t2]
-
-    for t in threads:
-        t.start()

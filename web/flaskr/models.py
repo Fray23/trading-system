@@ -1,9 +1,7 @@
 import datetime
 from sqlalchemy import Column, Integer, String, Float, DateTime, Text, Boolean
 from werkzeug.security import generate_password_hash, check_password_hash
-
-from flaskr.database import Base, db_session as session
-
+from web.flaskr.database import Base, db_session as session
 
 class Order(Base):
     __tablename__ = 'orders'
@@ -39,19 +37,12 @@ class Order(Base):
 class Log(Base):
     __tablename__ = 'logs'
     id = Column(Integer, primary_key=True)
-    order_id = Column(Integer, unique=True, nullable=True)
     description = Column(Text)
-    order_type = Column(String(20), nullable=True)
     log_type = Column(String(20), nullable=True)
-    price = Column(Float, nullable=True)
-    quantity = Column(Float, nullable=True)
-    commission = Column(Float, nullable=True)
-    fail = Column(Boolean, default=False)
-    analysis_ = Column(Integer, nullable=True)
-    create = Column(DateTime,  default=datetime.datetime.utcnow())
+    created = Column(DateTime,  default=datetime.datetime.utcnow)
 
     def __repr__(self):
-        return f"({self.id}, {self.fail})"
+        return f"({self.id}, {self.log_type})"
 
     @classmethod
     def create(cls, **kwargs):
@@ -80,6 +71,15 @@ class SettingValue(Base):
 
     def __repr__(self):
         return f"({self.id}, {self.slug}, {self.value})"
+
+    @classmethod
+    def create(cls, slug, value):
+        obj = cls(
+            slug=slug,
+            value=value
+        )
+        session.add(obj)
+        session.commit()
 
 
 class PairSetting(Base):

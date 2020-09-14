@@ -1,5 +1,6 @@
-import flaskr.bot.analysis.moving_average as ta
-from flaskr.config import USE_OPEN_CANDLES, POINTS_TO_ENTER, log
+import bot.analysis.moving_average as ta
+from bot.config import USE_OPEN_CANDLES, get_points_to_enter
+from bot.logger import logger
 
 
 def analysis(klines):
@@ -49,6 +50,11 @@ def analysis(klines):
     if high[-1] > upper[-1]:
         # Свеча пробила верхнюю полосу Боллинджера
         enter_points += 3
+    points_to_enter = get_points_to_enter()
 
-    log.debug("Свеча набрала {b} баллов, минимум {p}".format(b=enter_points, p=POINTS_TO_ENTER))
-    return enter_points < POINTS_TO_ENTER
+    log_data = {
+        'description': f"Свеча набрала {enter_points} баллов, минимум {points_to_enter}",
+        'log_type': 'debug',
+    }
+    logger(**log_data)
+    return enter_points < points_to_enter

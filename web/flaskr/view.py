@@ -2,11 +2,18 @@ from flask import (
     Blueprint, redirect, render_template, request, url_for
 )
 
-from flaskr.auth import login_required
-from flaskr.models import Order, SettingValue, Log, PairSetting
-from flaskr.database import db_session
+from web.flaskr.auth import login_required
+from web.flaskr.models import Order, SettingValue, Log, PairSetting
+from web.flaskr.database import db_session
+from sqlalchemy import desc
 
 bp = Blueprint('admin', __name__)
+
+
+@bp.route('/', methods=('GET',))
+@login_required
+def index():
+    return render_template('base.html')
 
 
 @bp.route('/setting', methods=('GET',))
@@ -19,7 +26,7 @@ def setting_view():
 @bp.route('/log', methods=('GET',))
 @login_required
 def log_view():
-    objs = Log.query.all()
+    objs = Log.query.order_by(desc(Log.created)).limit(40).all()
     return render_template('log.html', objs=objs)
 
 
@@ -33,7 +40,7 @@ def pairs_view():
 @bp.route('/orders', methods=('GET',))
 @login_required
 def orders_view():
-    objs = Order.query.all()
+    objs = Order.query.order_by(desc(Order.id)).limit(40).all()
     return render_template('orders.html', objs=objs)
 
 

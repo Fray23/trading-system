@@ -131,4 +131,3 @@ class Binance():
         if 'code' in response.text:
             print(response.text)
         return response.json()
-

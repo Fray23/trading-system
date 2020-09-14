@@ -1,6 +1,7 @@
 import os
+
 from flask import Flask
-from flaskr.database import db_session
+from web.flaskr.database import db_session
 
 
 def create_app(test_config=None):
@@ -24,7 +25,8 @@ def create_app(test_config=None):
     except OSError:
         pass
 
-    from flaskr import auth, view
+    from web.flaskr import view
+    from web.flaskr import auth
     app.register_blueprint(auth.bp)
     app.register_blueprint(view.bp)
 
@@ -33,6 +35,3 @@ def create_app(test_config=None):
         db_session.remove()
 
     return app
-
-
-app = create_app()

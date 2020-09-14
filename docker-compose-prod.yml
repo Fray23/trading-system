@@ -5,6 +5,9 @@ services:
     ports:
       - "80:5000"
     environment:
-      FLASK_ENV: development
+      FLASK_ENV: production
+    volumes:
+      - test_data:/code/flaskr/db
 
-    command: gunicorn --bind 0.0.0.0:5000 wsgi:app
+volumes:
+  test_data:

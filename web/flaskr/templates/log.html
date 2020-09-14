@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+
+{% block left %}
+{% endblock %}
+
+
+{% block right %}
+        <thead>
+            <tr>
+                <th>id</th>
+                <th>description</th>
+                <th>log_type</th>
+                <th>created</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for obj in objs %}
+            <tr>
+                <th>{{ obj.id }}</th>
+                <th>{{ obj.description }}</th>
+                <th>{{ obj.log_type }}</th>
+                <th>{{ obj.created }}</th>
+            </tr>
+        {% endfor %}
+        </tbody>
+{% endblock %}

@@ -7,3 +7,4 @@ COPY requirements.txt requirements.txt
 RUN pip install -r requirements.txt
 EXPOSE 5000
 COPY . .
+CMD ["python3", "run_trade.py", "&&", "gunicorn", "--bind", "0.0.0.0:5000", "wsgi:app"]

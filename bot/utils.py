@@ -1,7 +1,7 @@
 import time
 import datetime
-from flaskr.bot.trades import BaseTrade
-from flaskr.models import Log
+from bot.trades import BaseTrade
+from bot.logger import logger
 
 def adjust_to_step(value, step, increase=False):
    return ((int(value * 100000000) - int(value * 100000000) % int(
@@ -18,31 +18,23 @@ def calc_buy_avg_rate(order_trades, log):
         spent += trade.trade_amount * trade.trade_rate
         fee += trade.trade_fee
 
-        Log.create(
-            description='По ордеру была сделка {id} на покупку {am:0.8f} по курсу {r:0.8f}, комиссия {fee:0.8f} {f_a}'.format(
-                id=trade.trade_id,
-                am=trade.trade_amount,
-                r=trade.trade_rate,
-                fee=trade.trade_fee,
-                f_a=trade.fee_type
-            ),
-            log_type='debug',
-            log=log,
-        )
-    try:
-        avg_rate = spent / bought
-    except ZeroDivisionError:
-        Log.create(
-            description='Не удалось посчитать средневзвешенную цену, деление на 0',
-            log_type='debug',
-            log=log,
-            fail=True
-        )
-        avg_rate = 0
-    Log.create(
+        try:
+            logger(description='По ордеру была сделка {id} на покупку {am:0.8f} по курсу {r:0.8f}, комиссия {fee:0.8f} {f_a}'.format(
+                    id=trade.trade_id,
+                    am=trade.trade_amount,
+                    r=trade.trade_rate,
+                    fee=trade.trade_fee,
+                    f_a=trade.fee_type
+                ),
+                log_type='debug',)
+            avg_rate = spent / bought
+        except ZeroDivisionError:
+            logger(description='Не удалось посчитать средневзвешенную цену, деление на 0',
+                log_type='debug',)
+            avg_rate = 0
+    logger(
         description='Средневзвешенная цена {ar:0.8f}'.format(ar=avg_rate),
         log_type='debug',
-        log=log,
     )
     return avg_rate
 
@@ -58,34 +50,23 @@ def calc_sell_avg_rate(order_trades, log):
         got += trade.trade_amount * trade.trade_rate
         fee += trade.trade_fee
 
-        Log.create(
-            description='По ордеру была сделка {id} на продажу {am:0.8f} по курсу {r:0.8f}, комиссия {fee:0.8f} {f_a}'.format(
+        logger(description='По ордеру была сделка {id} на продажу {am:0.8f} по курсу {r:0.8f}, комиссия {fee:0.8f} {f_a}'.format(
                 id=trade.trade_id,
                 am=trade.trade_amount,
                 r=trade.trade_rate,
                 fee=trade.trade_fee,
                 f_a=trade.fee_type
             ),
-            log_type='debug',
-            log=log,
-        )
+            log_type='debug',)
     try:
         avg_rate = got / sold
     except ZeroDivisionError:
-        Log.create(
-            description='Не удалось посчитать средневзвешенную цену, деление на 0',
-            log_type='debug',
-            log=log,
-            fail=True
-        )
+        logger(description='Не удалось посчитать средневзвешенную цену, деление на 0',
+            log_type='debug',)
         avg_rate = 0
 
-    Log.create(
-        description='Средневзвешенная цена {ar:0.8f}'.format(ar=avg_rate),
-        log_type='debug',
-        log=log,
-    )
-
+    logger(description='Средневзвешенная цена {ar:0.8f}'.format(ar=avg_rate),
+        log_type='debug',)
     return avg_rate
 
 
@@ -123,7 +104,7 @@ def sync_time(bot, log, pause):
 
             if local_time + shift_seconds != server_time:
                 bot.set_shift_seconds(shift_seconds)
-                Log.create(
+                logger(
                     description="""
                     Текущее время: {local_time_d} {local_time_u}
                     Время сервера: {server_time_d} {server_time_u}
@@ -138,8 +119,7 @@ def sync_time(bot, log, pause):
                         fake_time_u=local_time + shift_seconds
                     ),
                     log_type='debug',
-                    log=log,
-                )
+                    )
 
         except:
             log.exception('sync_time error')

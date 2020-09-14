@@ -2,9 +2,10 @@ import functools
 from flask import (
     Blueprint, flash, g, redirect, render_template, request, session, url_for
 )
-from flaskr.models import User
+from web.flaskr.models import User
 
 bp = Blueprint('auth', __name__, url_prefix='/auth')
+
 
 @bp.before_app_request
 def load_logged_in_user():
@@ -15,6 +16,7 @@ def load_logged_in_user():
     else:
         g.user = User.query.filter_by(id=user_id).one_or_none()
 
+
 def login_required(view):
     @functools.wraps(view)
     def wrapped_view(**kwargs):
@@ -24,6 +26,7 @@ def login_required(view):
         return view(**kwargs)
 
     return wrapped_view
+
 
 @bp.route('/login', methods=('GET', 'POST'))
 def login():
