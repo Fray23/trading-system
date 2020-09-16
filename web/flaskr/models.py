@@ -101,7 +101,7 @@ class User(Base):
     __tablename__ = 'users'
     id = Column(Integer, primary_key=True)
     name = Column(String(50), unique=True)
-    password = Column(String(50))
+    password = Column(String(255))
     is_admin = Column(Boolean, default=False)
 
     def __repr__(self):

@@ -124,6 +124,7 @@ class OrderProcess:
         return price_change
 
     def create_order(self, side, recvWindow, quantity, price=0.):
+        quantity = float(quantity)
         new_order = api.createOrder(
             symbol=self.pair,
             recvWindow=recvWindow,
@@ -204,6 +205,12 @@ def main_flow():
 
                 order_trade_data = api.orderInfo(symbol=order.pair, orderId=order.order_id)
 
+                if 'status' not in order_trade_data:
+                    logger(
+                        description='\'status\' not in order_trade_data, pair={order.pair}, orderId={order.order_id}',
+                        log_type='warning'
+                    )
+                    continue
                 order_status = order_trade_data['status']
                 order_type = order.order_type
                 pair = order.pair
@@ -238,10 +245,14 @@ def main_flow():
                 if use_stop_loss and order_status == 'FILLED' and order_type == 'buy':
                     curr_rate = float(api.tickerPrice(symbol=pair)['price'])
                     buy_price = order.obj.buy_price,
-                    logger(description=f"{pair} Цена упала до стоплосс (покупали по {buy_price:0.8f}, сейчас {curr_rate:0.8f}), пора продавать", log_type='info')
 
-                    if (1 - curr_rate / buy_price) * 100 >= stop_loss:
-                        order_process.create_order(side='SELL', quantity=order.obj.buy_amount, recvWindow=15000)
+                    if (1 - curr_rate / buy_price[0]) * 100 >= stop_loss:
+                        logger(
+                            description=f"{pair} Цена упала до стоплосс (покупали по {buy_price}, сейчас {curr_rate}),\
+                             пора продавать, процент для продажи {stop_loss}",
+                            log_type='info')
+                        buy_amount = order_process.get_qty()
+                        order_process.create_order(side='SELL', quantity=buy_amount, recvWindow=15000)
 
         for order in get_running_orders():
             del all_pairs[order.pair]
