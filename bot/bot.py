@@ -284,7 +284,7 @@ def main_flow():
                 minQty = CURR_LIMITS['filters'][2]['minQty']
                 minNotional = CURR_LIMITS['filters'][3]['minNotional']
 
-                if analysis(klines):
+                if analysis(klines=klines):
                     continue
 
                 balances = {

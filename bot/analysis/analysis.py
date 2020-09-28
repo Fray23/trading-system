@@ -1,9 +1,12 @@
+import statistics as stat
+import math
+import pandas as pd
 import bot.analysis.moving_average as ta
 from bot.config import USE_OPEN_CANDLES, get_points_to_enter
 from bot.logger import logger
 
 
-def analysis(klines):
+def _analysis(klines):
     klines = klines[:len(klines) - int(not USE_OPEN_CANDLES)]
 
     closes = [float(x[4]) for x in klines]
@@ -58,3 +61,66 @@ def analysis(klines):
     }
     logger(**log_data)
     return enter_points < points_to_enter
+
+
+def analysis(klines,
+        sma_p=17,
+        NUM_PERIODS_FAST=6,
+        NUM_PERIODS_SLOW=24,
+        APO_VALUE_FOR_BUY_ENTRY=-5,
+        ):
+    closes = [float(x[4]) for x in klines]
+    timestamp_open_list = [float(x[1]) for x in klines]
+    high_list = [float(x[2]) for x in klines]
+    low_list = [float(x[3]) for x in klines]
+    timestamp_close_list = [float(x[6]) for x in klines]
+    data = []
+
+    for op, close, high, low in zip(timestamp_open_list, closes, high_list, low_list):
+        data.append({'open': op, 'close': close, 'high': high, 'low': low})
+    data = pd.DataFrame(data, index=timestamp_close_list)
+
+    price_history = []
+
+    K_FAST = 2 / (NUM_PERIODS_FAST + 1)
+    ema_fast = 0
+    ema_fast_values = []
+
+    K_SLOW = 2 / (NUM_PERIODS_SLOW + 1)
+    ema_slow = 0
+    ema_slow_values = []
+
+    apo_valus = []
+    stdev_factors = []
+    close = data['close']
+    for close_price in close:
+        price_history.append(close_price)
+        if len(price_history) > sma_p:
+            del price_history[0]
+        sma = stat.mean(price_history)
+
+        variance = 0
+        for hist_price in price_history:
+            variance = variance + ((hist_price - sma) ** 2)
+        stdev = math.sqrt(variance / len(price_history))
+        stdev_factor = stdev / 15
+        if stdev_factor == 0:
+            stdev_factor = 1
+        stdev_factors.append(stdev_factor)
+
+        if ema_fast == 0:
+            ema_fast = close_price
+            ema_slow = close_price
+        else:
+            ema_fast = (close_price - ema_fast) * K_FAST * stdev_factor + ema_fast
+            ema_slow = (close_price - ema_slow) * K_SLOW * stdev_factor + ema_slow
+
+        ema_fast_values.append(ema_fast)
+        ema_slow_values.append(ema_slow)
+        apo = ema_fast - ema_slow
+        apo_valus.append(apo)
+
+    apo = apo_valus[-1]
+    stdev_factor = stdev_factors[-1]
+
+    return apo < APO_VALUE_FOR_BUY_ENTRY * stdev_factor and ema_slow_values[-1] > ema_slow_values[-2] > ema_slow_values[-3]
