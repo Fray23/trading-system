@@ -123,4 +123,12 @@ def analysis(klines,
     apo = apo_valus[-1]
     stdev_factor = stdev_factors[-1]
 
-    return apo < APO_VALUE_FOR_BUY_ENTRY * stdev_factor and ema_slow_values[-1] > ema_slow_values[-2] > ema_slow_values[-3]
+    trand = ema_slow_values[-1] > ema_slow_values[-2] > ema_slow_values[-3]
+    buy = apo < APO_VALUE_FOR_BUY_ENTRY * stdev_factor and trand
+
+    log_data = {
+        'description': f"trand {trand} and {apo} < {APO_VALUE_FOR_BUY_ENTRY * stdev_factor}, res:{buy}",
+        'log_type': 'debug',
+    }
+    logger(**log_data)
+    return buy

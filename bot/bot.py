@@ -1,11 +1,11 @@
 import time
 import datetime
+from sqlalchemy import or_, and_
 
 from bot.analysis.analysis import analysis
 from web.flaskr import db_session as session
 from bot.logger import logger, log
 from web.flaskr.models import Order, PairSetting, SettingValue
-from sqlalchemy import or_, and_
 
 from bot.config import api, get_timeframe, get_klines_limits
 from bot.utils import adjust_to_step, calc_buy_avg_rate, get_order_trades
@@ -284,7 +284,7 @@ def main_flow():
                 minQty = CURR_LIMITS['filters'][2]['minQty']
                 minNotional = CURR_LIMITS['filters'][3]['minNotional']
 
-                if analysis(klines=klines):
+                if not analysis(klines=klines):
                     continue
 
                 balances = {
