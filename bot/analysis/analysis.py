@@ -2,7 +2,7 @@ import statistics as stat
 import math
 import pandas as pd
 import bot.analysis.moving_average as ta
-from bot.config import USE_OPEN_CANDLES, get_points_to_enter
+from bot.config import USE_OPEN_CANDLES, get_points_to_enter, get_setting_value, slugs
 from bot.logger import logger
 
 
@@ -63,17 +63,17 @@ def _analysis(klines):
     return enter_points < points_to_enter
 
 
-def analysis(klines,
-        sma_p=17,
-        NUM_PERIODS_FAST=6,
-        NUM_PERIODS_SLOW=24,
-        APO_VALUE_FOR_BUY_ENTRY=-5,
-        ):
+def analysis_apo(klines):
+    sma_p                   = get_setting_value(slugs['apo_sma_p'], 17, int)
+    NUM_PERIODS_FAST        = get_setting_value(slugs['APO_NUM_PERIODS_FAST'], 6, int)
+    NUM_PERIODS_SLOW        = get_setting_value(slugs['APO_NUM_PERIODS_SLOW'], 24, int)
+    APO_VALUE_FOR_BUY_ENTRY = get_setting_value(slugs['APO_VALUE_FOR_BUY_ENTRY'], -5, int)
+
     closes = [float(x[4]) for x in klines]
     timestamp_open_list = [float(x[1]) for x in klines]
+    timestamp_close_list = [float(x[6]) for x in klines]
     high_list = [float(x[2]) for x in klines]
     low_list = [float(x[3]) for x in klines]
-    timestamp_close_list = [float(x[6]) for x in klines]
     data = []
 
     for op, close, high, low in zip(timestamp_open_list, closes, high_list, low_list):
@@ -132,3 +132,7 @@ def analysis(klines,
     }
     logger(**log_data)
     return buy
+
+
+def analysis(klines):
+    return analysis_apo(klines)

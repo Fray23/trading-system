@@ -9,9 +9,27 @@ limits = api.exchangeInfo()
 
 USE_OPEN_CANDLES = True
 
+slugs = {
+    'apo_sma_p': 'apo_sma_p',
+    'APO_NUM_PERIODS_FAST': 'APO_NUM_PERIODS_FAST',
+    'APO_NUM_PERIODS_SLOW': 'APO_NUM_PERIODS_SLOW',
+    'APO_VALUE_FOR_BUY_ENTRY': 'APO_VALUE_FOR_BUY_ENTRY',
+
+    'klines_limits': 'klines_limits',
+    'points_to_enter': 'points_to_enter',
+    'timeframe': 'timeframe'
+}
+APO_SMA_P = 'apo_sma_p'
+APO_NUM_PERIODS_FAST = 'APO_NUM_PERIODS_FAST'
+APO_NUM_PERIODS_SLOW = 'APO_NUM_PERIODS_SLOW'
+APO_VALUE_FOR_BUY_ENTRY = 'APO_VALUE_FOR_BUY_ENTRY'
+KLINES_LIMITS = 'klines_limits'
+POINTS_TO_ENTER = 'points_to_enter'
+TIMEFRAME = 'timeframe'
+
 
 def get_klines_limits():
-    klines_limits = SettingValue.query.filter_by(slug='klines_limits').one_or_none()
+    klines_limits = SettingValue.query.filter_by(slug=slugs['klines_limits']).one_or_none()
     if klines_limits:
         klines_limits = int(klines_limits.value)
     else:
@@ -22,7 +40,7 @@ def get_klines_limits():
 
 
 def get_points_to_enter():
-    points_to_enter = SettingValue.query.filter_by(slug='points_to_enter').one_or_none()
+    points_to_enter = SettingValue.query.filter_by(slug=slugs['points_to_enter']).one_or_none()
     if points_to_enter:
         points_to_enter = float(points_to_enter.value)
     else:
@@ -33,7 +51,7 @@ def get_points_to_enter():
 
 
 def get_timeframe():
-    timeframe = SettingValue.query.filter_by(slug='timeframe').one_or_none()
+    timeframe = SettingValue.query.filter_by(slug=slugs['timeframe']).one_or_none()
     if not timeframe:
         timeframe = '1d'
         logger(description="timeframe не найден, установленно значание 1d")
@@ -41,3 +59,15 @@ def get_timeframe():
     else:
         timeframe = timeframe.value
     return timeframe
+
+
+def get_setting_value(slug, default, value_type):
+    value = SettingValue.query.filter_by(slug=slug).one_or_none()
+    if not value:
+        value = value_type(default)
+        logger(description=f"{slug} не найден, установленно значание {default}")
+        SettingValue.create(f"{slug}", f"{default}")
+        return value
+    else:
+        value = value_type(value.value)
+    return value
