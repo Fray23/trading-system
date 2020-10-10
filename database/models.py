@@ -1,7 +1,8 @@
 import datetime
 from sqlalchemy import Column, Integer, String, Float, DateTime, Text, Boolean
 from werkzeug.security import generate_password_hash, check_password_hash
-from web.flaskr.database import Base, db_session as session
+from database.db import Base, db_session as session
+
 
 class Order(Base):
     __tablename__ = 'orders'

@@ -2,13 +2,13 @@ import time
 import datetime
 from sqlalchemy import or_, and_
 
-from bot.analysis.analysis import analysis
+from trade.analysis.analysis import analysis
 from web.flaskr import db_session as session
-from bot.logger import logger, log
-from web.flaskr.models import Order, PairSetting, SettingValue
+from trade.bot.logger import logger, log
+from database.models import Order, PairSetting, SettingValue
 
-from bot.config import api, get_timeframe, get_klines_limits
-from bot.utils import adjust_to_step, calc_buy_avg_rate, get_order_trades
+from trade.bot.config import api, get_timeframe, get_klines_limits
+from trade.bot.utils import adjust_to_step, calc_buy_avg_rate, get_order_trades
 
 limits = api.exchangeInfo()
 

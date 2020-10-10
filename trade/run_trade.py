@@ -1,9 +1,9 @@
 import threading
 
-from bot.bot import main_flow
-from bot.config import api
-from bot.utils import sync_time
-from bot.logger import log
+from trade.bot.trade import main_flow
+from trade.bot.config import api
+from trade.bot.utils import sync_time
+from trade.bot.logger import log
 
 
 if __name__ == '__main__':

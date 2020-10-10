@@ -9,5 +9,5 @@ RUN pip install -r requirements.txt
 EXPOSE 5000
 COPY . .
 RUN chmod +x run_trade.sh
-RUN mkdir /code/bot/logs
+RUN mkdir /code/trade/logs
 CMD ["gunicorn", "--bind", "0.0.0.0:5000", "wsgi:app"]

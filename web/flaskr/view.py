@@ -3,8 +3,8 @@ from flask import (
 )
 
 from web.flaskr.auth import login_required
-from web.flaskr.models import Order, SettingValue, Log, PairSetting
-from web.flaskr.database import db_session
+from database.models import Order, SettingValue, Log, PairSetting
+from database.db import db_session
 from sqlalchemy import desc
 
 bp = Blueprint('admin', __name__)

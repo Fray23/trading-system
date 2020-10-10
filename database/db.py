@@ -3,9 +3,6 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import scoped_session, sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
 
-flaskr_dir = os.path.dirname(os.path.abspath(__file__))
-database_path = os.path.join(flaskr_dir, 'db')
-
 POSTGRES_URL="postgres:5432"
 POSTGRES_USER="postgres"
 POSTGRES_PASSWORD="1234postgres1234"
@@ -20,5 +17,4 @@ Base = declarative_base()
 Base.query = db_session.query_property()
 
 def init_db():
-    import web.flaskr.models
     Base.metadata.create_all(engine)

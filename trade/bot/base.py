@@ -1,8 +1,8 @@
 from sqlalchemy import and_
-from bot.bot import OrderProcess
-from bot.config import api
+from trade.bot.trade import OrderProcess
+from trade.bot.config import api
 from web.flaskr import db_session as session
-from web.flaskr.models import Order
+from database.models import Order
 
 
 class OrderSimple:

@@ -47,10 +47,6 @@ class BitrixApi:
         return response
 
 
-# publick
-# secure
-
-
 class Binance():
     methods = {
         # public methods
@@ -61,7 +57,7 @@ class Binance():
         'trades': {'url': 'api/v1/trades', 'method': 'GET', 'private': False},
         'historicalTrades': {'url': 'api/v1/historicalTrades', 'method': 'GET', 'private': False},
         'aggTrades': {'url': 'api/v1/aggTrades', 'method': 'GET', 'private': False},
-        'klines': {'url': 'api/v3/klines', 'method': 'GET', 'private': False},                        # +
+        'klines': {'url': 'api/v3/klines', 'method': 'GET', 'private': False},
 
         'ticker24hr': {'url': 'api/v1/ticker/24hr', 'method': 'GET', 'private': False},
         'tickerPrice': {'url': 'api/v3/ticker/price', 'method': 'GET', 'private': False},

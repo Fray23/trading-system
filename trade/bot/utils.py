@@ -1,7 +1,7 @@
 import time
 import datetime
-from bot.trades import BaseTrade
-from bot.logger import logger
+from trade.bot.trades import BaseTrade
+from trade.bot.logger import logger
 
 def adjust_to_step(value, step, increase=False):
    return ((int(value * 100000000) - int(value * 100000000) % int(

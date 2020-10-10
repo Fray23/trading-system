@@ -1,9 +1,7 @@
 #!/bin/bash
 
-if pgrep -af run_trade.py
+if pgrep -af trade/run_trade.py
 	then
-	  nohup python3 run_trade.py & ls
-		echo "+"
+	  nohup python3 trade/run_trade.py & ls
 	else
-		echo "-"
 fi

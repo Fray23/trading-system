@@ -1,7 +1,7 @@
 import os
 
 from flask import Flask
-from web.flaskr.database import db_session
+from database.db import db_session
 
 
 def create_app(test_config=None):

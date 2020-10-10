@@ -1,9 +1,9 @@
 import statistics as stat
 import math
 import pandas as pd
-import bot.analysis.moving_average as ta
-from bot.config import USE_OPEN_CANDLES, get_points_to_enter, get_setting_value, slugs
-from bot.logger import logger
+import trade.analysis.moving_average as ta
+from trade.bot.config import USE_OPEN_CANDLES, get_points_to_enter, get_setting_value, slugs
+from trade.bot.logger import logger
 
 
 def _analysis(klines):

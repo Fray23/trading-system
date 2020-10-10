@@ -1,7 +1,7 @@
 import os
 import logging
 
-from web.flaskr.models import Log
+from database.models import Log
 from web.flaskr.utils import log_types
 
 logging.basicConfig(

@@ -1,6 +1,6 @@
-from bot.api import Binance
-from web.flaskr.models import SettingValue
-from bot.logger import logger
+from trade.bot.api import Binance
+from database.models import SettingValue
+from trade.bot.logger import logger
 
 api = Binance(
 )
