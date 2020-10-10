@@ -1,8 +1,11 @@
+from settings import API_SECRET, API_KEY
 from trade.bot.api import Binance
 from database.models import SettingValue
 from trade.bot.logger import logger
 
 api = Binance(
+    API_KEY=API_KEY,
+    API_SECRET=API_SECRET
 )
 
 limits = api.exchangeInfo()
