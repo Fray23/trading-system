@@ -1,0 +1,50 @@
+{% extends 'base_top.html' %}
+
+{% block content %}
+<div class="container-fluid">
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>id</th>
+                <th>pair</th>
+
+                <th>buy_order_id</th>
+                <th>buy_amount</th>
+                <th>buy_price</th>
+                <th>buy_created</th>
+                <th>buy_finished</th>
+
+                <th>|</th>
+
+                <th>sell_order_id</th>
+                <th>sell_amount</th>
+                <th>sell_price</th>
+                <th>sell_created</th>
+                <th>sell_finished</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for obj in objs %}
+            <tr>
+                <th>{{ obj.id }}</th>
+                <th>{{ obj.pair }}</th>
+
+                <th>{{ obj.buy_order_id }}</th>
+                <th>{{ obj.buy_amount }}</th>
+                <th>{{ obj.buy_price }}</th>
+                <th>{{ obj.buy_created }}</th>
+                <th>{{ obj.buy_finished }}</th>
+
+                <th>|</th>
+
+                <th>{{ obj.sell_order_id }}</th>
+                <th>{{ obj.sell_amount }}</th>
+                <th>{{ obj.sell_price }}</th>
+                <th>{{ obj.sell_created }}</th>
+                <th>{{ obj.sell_finished }}</th>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

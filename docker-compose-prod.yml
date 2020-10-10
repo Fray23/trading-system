@@ -1,0 +1,21 @@
+version: '3'
+services:
+  web:
+    image: fray23/trade_bin:web
+    ports:
+      - "80:5000"
+    environment:
+      FLASK_ENV: production
+
+  postgres:
+    image: postgres:12.4
+    restart: always
+    env_file:
+      - .env
+    expose:
+      - "5432"
+    volumes:
+      - pgdata_prodaja:/var/lib/postgresql/data/
+
+volumes:
+  pgdata_prodaja:

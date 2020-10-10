@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+{% block left %}
+	<div class="list-group list-group-flush">
+		<form action="/setting/create_or_update">
+			<input type="text" class="list-group-item list-group-item-action mb-2 form-control" placeholder="slug" name="slug">
+			<input type="text" class="list-group-item list-group-item-action mb-2 form-control" placeholder="value" name="value">
+				<select class="form-control mb-2" name="type">
+					<option>create</option>
+					<option>update</option>
+					<option>delete</option>
+				</select>
+			<button formmethod="post" type="submit" class="list-group-item list-group-item-action btn btn-light">save</button>
+		</form>
+	</div>
+{% endblock %}
+
+{% block right_top %}
+<div class="card mb-2">
+  <div class="card-body text-secondary">
+	  <pre>
+		  slugs: run = 1/0 (default 0)
+		  pause = 60
+		  timeframe = \
+			Допустимые интервалы:
+			•    1m     // 1 минута
+			•    3m     // 3 минуты
+			•    5m    // 5 минут
+			•    15m  // 15 минут
+			•    30m    // 30 минут
+			•    1h    // 1 час
+			•    2h    // 2 часа
+			•    4h    // 4 часа
+			•    6h    // 6 часов
+			•    8h    // 8 часов
+			•    12h    // 12 часов
+			•    1d    // 1 день
+			•    3d    // 3 дня
+			•    1w    // 1 неделя
+			•    1M    // 1 месяц
+		  klines_limits = 200
+		  points_to_enter = 7
+	  </pre>
+  </div>
+</div>
+{% endblock %}
+
+{% block right %}
+	<thead>
+		<tr>
+			<th>id</th>
+			<th>name</th>
+			<th>value</th>
+		</tr>
+	</thead>
+	<tbody>
+	{% for obj in objs %}
+		<tr>
+			<td>{{ obj.id }}</td>
+			<td>{{ obj.slug }}</td>
+			<td>{{ obj.value }}</td>
+		</tr>
+	{% endfor %}
+	</tbody>
+{% endblock %}
